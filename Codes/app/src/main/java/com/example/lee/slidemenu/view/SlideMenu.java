@@ -2,6 +2,7 @@ package com.example.lee.slidemenu.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.gesture.GestureOverlayView;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,6 +12,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,6 +32,7 @@ public class SlideMenu extends HorizontalScrollView {
     private LinearLayout mWapper;   //外层的横向LinearLayout
     private ViewGroup mMenu;        //左侧菜单栏
     private ViewGroup mContent;     //内容区域
+    private GestureDetector gesture;//判断手势
     private int mScreenWidth;       //屏幕宽度
     private int mMenuRightPadding;  //menu距离右侧的距离，单位为px
     private boolean mMeasureOnce = false;   //是否已经测量过
@@ -37,7 +40,7 @@ public class SlideMenu extends HorizontalScrollView {
     private int mMenuWidth;         //菜单栏的宽度
     //右边距的默认值150dp,转换为px
     private int mDefaultRightPadding = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,150,
-                    getContext().getResources().getDisplayMetrics());
+            getContext().getResources().getDisplayMetrics());
 
 
     public SlideMenu(Context context) {
@@ -66,7 +69,7 @@ public class SlideMenu extends HorizontalScrollView {
         WindowManager wm = (WindowManager) getContext()
                 .getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics = new DisplayMetrics();
-         wm.getDefaultDisplay().getMetrics(outMetrics);
+        wm.getDefaultDisplay().getMetrics(outMetrics);
         mScreenWidth = outMetrics.widthPixels;
         init(attrs, defStyle);
     }
@@ -79,10 +82,30 @@ public class SlideMenu extends HorizontalScrollView {
                 attrs, R.styleable.SlideMenu, defStyle, 0);
 
         mMenuRightPadding = a.getDimensionPixelSize(R.styleable.SlideMenu_rightPadding,
-                            mDefaultRightPadding);
+                mDefaultRightPadding);
         a.recycle();
+
+        gesture = new GestureDetector(this.getContext(),onGestureListener);
     }
 
+    /**
+     * 设置手势监听器监听左右滑动手势
+     */
+    private GestureDetector.OnGestureListener onGestureListener=
+            new GestureDetector.SimpleOnGestureListener(){
+                @Override
+                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                    float x = e2.getX() - e1.getX();
+                    //float y = e2.getY() - e2.getY();
+                    if(x > 0){
+                        openMenu();
+                    }else{
+                        closeMenu();
+                    }
+                    return true;
+
+                }
+            };
     /**
      * 设置子View和自己的宽和高
      * @param widthMeasureSpec
@@ -94,7 +117,7 @@ public class SlideMenu extends HorizontalScrollView {
             //初始化控件
             mWapper =(LinearLayout)getChildAt(0);
             mMenu = (ViewGroup)mWapper.getChildAt(0);
-            mContent =(ViewGroup)findViewById(R.id.content);
+            mContent =(ViewGroup)mWapper.getChildAt(1);
             mMenuWidth = mScreenWidth - mMenuRightPadding;
             mMenu.getLayoutParams().width = mMenuWidth;
             mContent.getLayoutParams().width = mScreenWidth;
@@ -119,12 +142,22 @@ public class SlideMenu extends HorizontalScrollView {
         }
     }
 
+    /**
+     * 先判断是否是左右滑动手势，如果是则直接返回
+     * 若不是滑动手势，则根据手指抬起的位置确定是否打开菜单
+     * 其余触摸事件交给父类处理
+     * @param ev
+     * @return
+     */
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        if(gesture.onTouchEvent(ev)){
+            return true;
+        }
         int action = ev.getAction();
         switch (action){
             case MotionEvent.ACTION_UP:
-                //隐藏在左边的宽度
+                //已经滑动的的宽度
                 int scrollX = getScrollX();
                 if (scrollX>=mMenuWidth/2){
                     this.smoothScrollTo(mMenuWidth,0);
@@ -134,8 +167,9 @@ public class SlideMenu extends HorizontalScrollView {
                     mIsMenuOpen = true;
                 }
                 return true;
-
         }
+
+//        return super.onTouchEvent(ev) || b;
         return super.onTouchEvent(ev);
     }
 
@@ -149,12 +183,16 @@ public class SlideMenu extends HorizontalScrollView {
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
+
         //调用属性动画，设置menu的TranslationX使其一直与屏幕紧贴,乘一个系数使其初始时一部分在屏幕左侧
         mMenu.setTranslationX(l*0.8f);
+
         //l的变化范围是MenuWidth ~ 0，所以l/MenuWidth变化范围是1 ~ 0
         float scale = l*1.0f/mMenuWidth;
-        //我们的目标是右侧内容区实现1 ~ 0.8的缩放，所以对scale进行变换
+
+        //我们的目标是右侧内容区实现1 ~ 0.8的缩放，所以将scale变换为0.2f*scale + 0.8f
         float contentScale = 0.2f*scale + 0.8f;
+
         //设置Content缩放的中心点为左侧竖直边的中点,使其更加跟手
         mContent.setPivotX(0);
         mContent.setPivotY(mContent.getHeight()/2);
@@ -170,8 +208,6 @@ public class SlideMenu extends HorizontalScrollView {
         mMenu.setScaleY(menuScale);
         mMenu.setAlpha(alphaScale);
         //this.getBackground().setAlpha((int)(alphaScale*255.0f));
-
-
 
     }
 
