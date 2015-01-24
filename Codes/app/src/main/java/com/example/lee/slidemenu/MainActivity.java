@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 
-import com.example.lee.slidemenu.view.SlideMenu;
+import com.example.lee.slidemenu_library.view.SlideMenu;
 
 
 public class MainActivity extends Activity {

@@ -7,7 +7,7 @@ A slide menu component like QQ5.0
 
 ##用法:
 1. clone此项目至本地
-* 将本项目添加为你的项目的依赖，具体方法见：[on the stackoverflow][1]
+* 将本项目中slidemenu_library添加为你的项目的依赖，具体方法见：[on the stackoverflow][1]
 * 在布局文件根节点加入slidemenu的根节点
 
         xmlns:slidemenu="http://schemas.android.com/apk/res-auto"

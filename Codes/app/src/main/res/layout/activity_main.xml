@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-    <com.example.lee.slidemenu.view.SlideMenu
+    <com.example.lee.slidemenu_library.view.SlideMenu
         android:id="@+id/slideMenu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -40,6 +40,6 @@
 
         </LinearLayout>
 
-    </com.example.lee.slidemenu.view.SlideMenu>
+    </com.example.lee.slidemenu_library.view.SlideMenu>
 
 </RelativeLayout>

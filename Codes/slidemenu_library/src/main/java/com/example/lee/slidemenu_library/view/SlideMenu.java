@@ -1,27 +1,19 @@
-package com.example.lee.slidemenu.view;
+package com.example.lee.slidemenu_library.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.gesture.GestureOverlayView;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.GestureDetector;
-import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
-import com.example.lee.slidemenu.R;
+import com.example.lee.slidemenu_library.R;
+
 
 /**
  * TODO: document your custom view class.
@@ -53,7 +45,7 @@ public class SlideMenu extends HorizontalScrollView {
      * @param attrs
      */
     public SlideMenu(Context context, AttributeSet attrs) {
-        this(context,attrs,0);
+        this(context, attrs, 0);
     }
 
     /**
